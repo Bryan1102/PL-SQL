@@ -1,0 +1,132 @@
+/* DBMS_REDUCT API */
+/* https://oracle-base.com/articles/12c/data-redaction-12cr1 */
+/* https://docs.oracle.com/en/database/oracle/oracle-database/12.2/arpls/DBMS_REDACT.html#GUID-50C0E9F6-1EB1-4E9F-8A7B-89ACD761FD55 */
+DESC:
+-- It is designed to protect the low-privileged users (application users) and applies by default to all
+the DB users, with exception of the those who had been granted the EXEMPT REDACTION POLICY privilege.
+
+
+PRO:
+-- When using views, functions or procedures to access the data, it remains redacted:
+
+CON:
+-- Data Redaction does not apply to the where clause, so do not redact data which can be queried in the where clause!
+-- SYS is always an exception and able to see data!
+
+
+
+
+--Dependency
+grant execute on sys.dbms_redact to <user>;
+grant select on sys.redaction_policies to <user>;
+grant select on sys.redaction_columns to <user>;
+
+
+	begin
+	  dbms_redact.add_policy(
+	    object_schema => user,  /*SCHEMA NAME*/
+	    object_name   => 'employees', /*table_name*/
+	    column_name   => 'ssn', /*column name*/
+	    policy_name   => 'redact_ssn', 
+	    function_type => dbms_redact.FULL, /*guide to full: https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/REDACTION_VALUES_FOR_TYPE_FULL.html#GUID-7C9711A8-C3FA-413E-90A4-5E875FFAB870 */
+--OR  function_type => dbms_redact.PARTIAL
+	    expression    => '1=1'
+	  );
+	end;
+	/
+
+          /* **** INFO **** */
+          /*
+          		Define the masking manually with following format:
+          		Partial Masking on Varchar Datatype
+          		
+          		function_parameters => 'VVVVFVVVVFVVVVFVVVV,VVVV-VVVV-VVVV-VVVV,*,1,12',
+          		
+          		Parameters:
+          		1. Input: V used for each character with can be redacted. F is used as formatting character same as its value.
+          		2. Output: V for each character to be potential and replace F with displayed format like hypen or space.
+          		3. Mask Character: Single character used as redaction like *, #.
+          		4. Starting digit position: starting V digit position for the redaction in parameter one.
+          		5. Ending digit position: ending V digit position for the redaction(Do not include the F positions)
+          		Example:
+          		
+          		BEGIN
+          		DBMS_REDACT.ADD_POLICY(
+          		object_schema => 'HR',
+          		object_name => 'employees',
+          		column_name => 'ssn',
+          		policy_name => 'redact_emp_ssns2',
+          		function_type => DBMS_REDACT.PARTIAL,
+          		function_parameters => 'VVVFVVFVVVV,VVV-VV-VVVV,*,1,5',
+          		expression => '1=1',
+          		policy_description => 'Partially redacts Social Security numbers',
+          		column_description => 'ssn contains character Social Security numbers');
+          		END;
+
+
+
+          Default boolean expression for the table or view. If this expression is used, then redaction takes place only if this policy expression evaluates to TRUE.
+          See
+          The following functions are supported:
+          	• SYS_CONTEXT
+          	• XS_SYS_CONTEXT
+          	• SUBSTR functions (includes SUBSTRB, SUBSTRC, SUBSTR2, SUBSTR4)
+          	• LENGTH functions (includes LENGTHB, LENGTHC, LENGTH2, LENGTH4)
+          	• V (APEX_UTIL.GET_SESSION_STATE)
+          	• NV (APEX_UTIL.GET_NUMERIC_SESSION_STATE)
+          	• OLS_LABEL_DOMINATES
+          	• DOMINATES
+          	• OLS_DOMINATES
+          	• OLS_DOM
+          	• DOM
+          	• OLS_STRICTLY_DOMINATES
+          	• STRICTLY_DOMINATES
+          	• S_DOM
+          	• SA_UTL.DOMINATES
+          	• SA_UTL.CHECK_READ
+          	• SA_UTL.NUMERIC_LABEL
+          	• CHAR_TO_LABEL
+          	• SA_SESSION.LABEL
+          
+          */
+
+
+  begin
+	  dbms_redact.alter_policy(
+	    object_schema => user,
+	    object_name   => 'employees',
+	    policy_name   => 'redact_ssn',
+	    action => DBMS_REDACT.MODIFY_EXPRESSION,
+	    
+	    expression    => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'')=''<user/schema>'''
+	 -- expression    => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'') IN(''<user/schema>'',''<user/schema>'')'
+	 
+   -- no nested select allowed :(
+   -- expression    => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'') IN(SELECT DISTINCT USERNAME FROM ... WHERE ...)'
+   -- expression    => 'APEX_UTIL.GET_SESSION_STATE(''APP_USER_ROLE'') IS NULL AND APEX_UTIL.GET_SESSION_STATE(''APP_USER_ROLE_2'') IS NULL'
+
+
+
+
+
+
+
+/* DBMS_TSDP_PROTECT API */
+
+--DESC
+Oracle Transparent Sensitive Data Protection Another new security feature of Oracle 12c is basically a complement to Data Redaction and
+Virtual Private Database. It is a free option available with Enterprise Edition and is better managed using Enterprise Manager than using the actual DBMS packages.
+This feature allows to categorize sensitive columns across a database and then to set a policy to each defined category of columns. For instance:
+Telephone number columns ! policy to redact into a random number Address columns ! policy to partially hide the data
+You use the packages DBMS_TSDP_MANAGE and DBMS_TSDP_PROTECT to manage the categories and policies, like shown on the example below. 
+It is not so straight forward as with Data Redaction, but can be useful to define enterprise wide sensitive data protection strategies.
+
+
+--Dependency
+grant execute on sys.dbms_tsdp_protect to <user>;
+
+--QUERY FROM SYS
+	SELECT * FROM dba_tsdp_policy_feature;
+	SELECT * FROM dba_tsdp_policy_parameter;
+	SELECT * FROM dba_tsdp_policy_type;
+	SELECT * FROM dba_tsdp_policy_protection;

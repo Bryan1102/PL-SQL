@@ -1,6 +1,8 @@
 /* DBMS_REDUCT API */
 /* https://oracle-base.com/articles/12c/data-redaction-12cr1 */
 /* https://docs.oracle.com/en/database/oracle/oracle-database/12.2/arpls/DBMS_REDACT.html#GUID-50C0E9F6-1EB1-4E9F-8A7B-89ACD761FD55 */
+/* https://docs.oracle.com/en/database/oracle/oracle-database/12.2/asoag/configuring-oracle-data-redaction-policies.html#GUID-A251209F-8BC3-4504-8DED-F6B72162A03B */
+
 DESC:
 -- It is designed to protect the low-privileged users (application users) and applies by default to all
 the DB users, with exception of the those who had been granted the EXEMPT REDACTION POLICY privilege.

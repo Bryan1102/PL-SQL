@@ -131,6 +131,8 @@ ORA-06512: at line 2
 solution:
 
 create first policy, then user ALTER_POLICY to extend the policy with more columns
+
+/* https://oracle-base.com/articles/12c/data-redaction-enhancements-12cr2 */
 BEGIN
 DBMS_REDACT.alter_policy (
     object_schema       => user,

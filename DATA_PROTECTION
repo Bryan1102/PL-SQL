@@ -115,6 +115,41 @@ grant select on sys.redaction_columns to <user>;
 
 
 
+
+/*ISSUES*/
+
+/*source: https://github.com/lucasjellema/OracleDatabase12c-development-demonstration/blob/master/data_redaction.txt*/
+finding
+When creating a second redaction policy on table emp on a different column than the first, this error was shown:
+
+Error report:
+ORA-28069: A data redaction policy already exists on this object.
+ORA-06512: at "SYS.DBMS_REDACT_INT", line 3
+ORA-06512: at "SYS.DBMS_REDACT", line 36
+ORA-06512: at line 2
+
+solution:
+
+create first policy, then user ALTER_POLICY to extend the policy with more columns
+BEGIN
+DBMS_REDACT.alter_policy (
+    object_schema       => user,
+    object_name         => '<table name>',
+    policy_name         => '<policy name>',
+    action              => DBMS_REDACT.add_column,
+    column_name         => '<col name>',
+    function_type       => DBMS_REDACT.FULL
+    
+  );
+END;
+
+
+
+
+
+
+
+
 /* DBMS_TSDP_PROTECT API */
 
 --DESC

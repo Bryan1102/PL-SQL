@@ -15,6 +15,8 @@ CON:
 -- Data Redaction does not apply to the where clause, so do not redact data which can be queried in the where clause!
 -- SYS is always an exception and able to see data!
 
+--Validation query
+Select * from REDACTION_COLUMNS ;
 
 
 

@@ -103,12 +103,12 @@ grant select on sys.redaction_columns to <user>;
 	    expression    => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'')=''<user/schema>'''
 	 -- expression    => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'') IN(''<user/schema>'',''<user/schema>'')'
 	 
-   -- no nested select allowed :(
+   -- no nested select allowed
    -- expression    => 'SYS_CONTEXT(''USERENV'',''SESSION_USER'') IN(SELECT DISTINCT USERNAME FROM ... WHERE ...)'
    -- expression    => 'APEX_UTIL.GET_SESSION_STATE(''APP_USER_ROLE'') IS NULL AND APEX_UTIL.GET_SESSION_STATE(''APP_USER_ROLE_2'') IS NULL'
    -- expression => 'V(''APP_USER'') != ''mavis@example.com'' or V(''APP_USER'') is null'
-
-
+  )
+  end;
 
 
 

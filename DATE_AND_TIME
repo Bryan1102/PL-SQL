@@ -1,8 +1,8 @@
 /* EXTRACT INTERVALS FROM TIMESTAMP */
-    SELECT EXTRACT( dayfromdiff ) days,
-          EXTRACT( hourfromdiff ) hours,
-          EXTRACT( minutefromdiff ) minutes,
-          EXTRACT( secondfromdiff ) seconds
+    SELECT EXTRACT( day from diff ) days,
+          EXTRACT( hour from diff ) hours,
+          EXTRACT( minute from diff ) minutes,
+          EXTRACT( second from diff ) seconds
       FROM(SELECT systimestamp -to_timestamp( '2012-07-23', 'yyyy-mm-dd') diff  FROM dual)
 
 

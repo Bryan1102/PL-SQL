@@ -15,3 +15,36 @@ BEGIN
         DBMS_OUTPUT.put_line ('IS JSON FALSE ' );
     END IF;
 END;
+
+
+/* IF STRING IS JSON ARRAY THEN YOU CAN PARSE IT AND WRITE VALUES */
+SET SERVEROUTPUT ON
+DECLARE
+    stringin    varchar2(100);
+    l_array     json_array_t;
+BEGIN
+    stringin := '[1, 2, 3]';
+   l_array := json_array_t.parse (stringin);
+   
+   DBMS_OUTPUT.put_line ('Number of elements in array: ' || l_array.get_size ());
+   
+   FOR indx IN 0 .. l_array.get_size - 1
+   LOOP
+      DBMS_OUTPUT.put_line ('numbers: ' || l_array.get_string (indx));
+   END LOOP;
+   
+   DBMS_OUTPUT.PUT_LINE(l_array.stringify());
+END;
+
+/* OUTPUT:
+        Number of elements in array: 3
+        numbers: 1
+        numbers: 2
+        numbers: 3
+        [1,2,3]
+        
+        
+        PL/SQL procedure successfully completed.
+*/
+
+

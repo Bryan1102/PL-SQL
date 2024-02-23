@@ -1,0 +1,17 @@
+/* VALIDATE STRING IF JSON */
+--Referrence: https://oracle-base.com/articles/12c/json-support-in-oracle-database-12cr1#is-json
+
+SET SERVEROUTPUT ON
+DECLARE
+    stringin    varchar2(100);
+BEGIN
+    --stringin := '["test", "something", "hehehe"]';
+    stringin := '[1, 2, 3]'; -- => This will result TRUE
+    --stringin := '[{1, 2, 3]'; -- => This will result FALSE
+    
+    IF stringin IS JSON THEN 
+        DBMS_OUTPUT.put_line ('IS JSON TRUE ' );
+    ELSE
+        DBMS_OUTPUT.put_line ('IS JSON FALSE ' );
+    END IF;
+END;

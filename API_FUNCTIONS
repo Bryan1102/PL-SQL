@@ -1,3 +1,5 @@
+/* CONVERT QUERY STRING OF API CALL TO STRING MAP */
+--https://jeffkemponoracle.com/2023/04/get-user-defined-query-parameters-from-ords/
 FUNCTION QUERY_STRING_MAP(p_query IN VARCHAR2) 
 return apex_application_global.vc_map
 is

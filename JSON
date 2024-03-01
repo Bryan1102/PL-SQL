@@ -47,4 +47,30 @@ END;
         PL/SQL procedure successfully completed.
 */
 
+/* FUNCTION TO JSON ESCAPE CHARACTERS IN ORDS API RESPONSE */
+FUNCTION F_UTIL_JSON_ESC_CHAR(p_text IN varchar2) 
+RETURN VARCHAR2
+IS
+    v_text VARCHAR2(400);
+
+BEGIN
+    /* REGEXP_REPLACE - replaces all JSON control characters - " quotation mark and \ reverse solidus-backslash */
+    --v_text := REGEXP_REPLACE(p_text, '([\|"])', '', 1, 0);
+    /* EDIT MOLNARGA 2024 02 29 seperated regexp, different chars, different actions because of filepaths */
+    v_text := REGEXP_REPLACE(p_text, '([|"])', '', 1, 0);
+    v_text := REGEXP_REPLACE(v_text, '([\/])', '\\\1', 1, 0);
+
+    /* REPLACE - replaces all non-control characters */
+    v_text := REPLACE(v_text,chr(9), chr(32)); /* chr(9) -Horizontal tab => chr(32) simple space?*/
+    v_text := REPLACE(v_text,chr(10), chr(32)); /* chr(10) - New Line => */
+    
+    RETURN v_text;
+    
+EXCEPTION
+    WHEN OTHERS
+        THEN raise_application_error(-20100, 'F_UTIL_JSON_ESC_CHAR ERROR - '|| 'sql error= ' || SQLERRM(SQLCODE));    
+    
+END;
+
+
 

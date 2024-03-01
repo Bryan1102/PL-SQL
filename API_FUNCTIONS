@@ -1,0 +1,42 @@
+FUNCTION QUERY_STRING_MAP(p_query IN VARCHAR2) 
+return apex_application_global.vc_map
+is
+    l_plist apex_t_varchar2;
+    l_map   apex_application_global.vc_map;
+begin
+    -- query string may be like:
+    --     param1=abc&param2=def&param3=ghi
+    -- or blanks may be included like:
+    --     param1=abc&param2=&param3=ghi
+    -- or the = symbol may be omitted:
+    --     param1=abc&param2&param3=ghi
+    --l_plist := apex_string.split(owa_util.get_cgi_env('QUERY_STRING'), '&');
+    l_plist := apex_string.split(p_query, '&');
+    for i in 1..l_plist.count loop
+        declare
+            l_offset pls_integer;
+            l_key    varchar2(255);
+            l_value  varchar2(32767);
+        begin
+            l_offset := instr(l_plist(i), '=');
+            if l_offset > 0 then
+                l_key   := substr(l_plist(i), 1, l_offset - 1);
+                l_value := substr(l_plist(i), l_offset + 1);
+            else
+                l_key := l_plist(i);
+                -- the value is null
+            end if;
+            -- ORDS may encode %20 as '+', but this is not detected by utl_url
+            l_key := replace(l_key, '+', ' ');
+            l_key := sys.utl_url.unescape(l_key, 'UTF-8');
+            
+            if l_value is not null then
+                l_value := replace(l_value, '+', ' ');
+                l_value := sys.utl_url.unescape(l_value, 'UTF-8');
+            end if;
+            -- add the key/value to the map
+            l_map(l_key) := l_value;
+        end;
+    end loop;
+    return l_map;
+end query_string_map;

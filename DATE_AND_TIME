@@ -1,3 +1,11 @@
+/* ADD 1 HOUR TO DATE */
+/* source: https://stackoverflow.com/questions/26510033/oracle-add-1-hour-in-sql */
+select sysdate + 1/24 from dual;
+select to_char(to_date('2014-10-15 03:30:00 pm', 'YYYY-MM-DD HH:MI:SS pm') + 1/24, 'YYYY-MM-DD HH:MI:SS pm') from dual;
+-- sysdate is a function without arguments which returns DATE type
+-- + 1/24 adds 1 hour to a date
+
+
 /* GROUP BY HOUR */
 /* source: https://stackoverflow.com/questions/5111396/sql-group-by-date-hour */
 SELECT TRUNC(datecol, 'HH24') FROM mytable

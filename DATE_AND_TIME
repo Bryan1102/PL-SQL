@@ -1,3 +1,9 @@
+/* GROUP BY HOUR */
+/* source: https://stackoverflow.com/questions/5111396/sql-group-by-date-hour */
+SELECT TRUNC(datecol, 'HH24') FROM mytable
+GROUP BY TRUNC(datecol, 'HH24');
+
+
 /* EXTRACT INTERVALS FROM TIMESTAMP */
     SELECT EXTRACT( day from diff ) days,
           EXTRACT( hour from diff ) hours,

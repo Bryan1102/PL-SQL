@@ -1,3 +1,13 @@
+/* EXTRACT HOUR FROM SYSTIMESTAMP */
+
+SELECT 
+    SYSTIMESTAMP AT TIME ZONE 'UTC'
+    ,SYSTIMESTAMP AT TIME ZONE 'Europe/Budapest'
+    ,SYSTIMESTAMP
+    ,(EXTRACT(HOUR FROM systimestamp AT TIME ZONE 'Europe/Budapest')) /* this will extract the UTC hour, indenpendently from time zone */
+    ,EXTRACT(HOUR FROM cast(systimestamp AT TIME ZONE 'Europe/Budapest' as timestamp)) /*Use TO_CHAR(tsz, 'HH24') or EXTRACT(hour from cast(tsz as timestamp)) if you like to get local hours.*/
+FROM DUAL;
+
 /* ADD 1 HOUR TO DATE */
 /* source: https://stackoverflow.com/questions/26510033/oracle-add-1-hour-in-sql */
 select sysdate + 1/24 from dual;

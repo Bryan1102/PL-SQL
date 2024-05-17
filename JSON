@@ -47,6 +47,54 @@ END;
         PL/SQL procedure successfully completed.
 */
 
+
+/* RECEIVING JSON ARRAY CONTAINING JSON OBJECTS */
+set serveroutput on
+Declare
+
+input_text clob := '[
+	{
+		"Artikelnr": "00000100001",
+		"BezLang": "item test 1 "
+	},
+	{
+		"Artikelnr": "00000230006",
+		"BezLang": "item test 2"
+	}
+]';
+p_object json_object_t;
+l_json_a json_array_t;
+l_itemnr varchar2(200);
+
+begin
+
+dbms_output.put_line('input_text= ' || input_text);
+IF input_text is json THEN dbms_output.put_line('it is indeed json =) '); END IF;
+--p_object := input_text;
+l_json_a := json_array_t.parse(input_text);
+
+
+DBMS_OUTPUT.put_line ('Number of elements in array: ' || l_json_a.get_size ());
+   
+   FOR indx IN 0 .. l_json_a.get_size - 1
+   LOOP
+        --p_object := json_object_t.parse(l_json_a.get_string (indx)); /*not working*/
+        p_object := treat(l_json_a.get(indx) as json_object_t );
+        DBMS_OUTPUT.put_line ('obj: ' || indx || ' - ' || p_object.to_string);
+        
+        IF p_object.has('Artikelnr') 
+        THEN 
+            dbms_output.put_line('it has indeed artikelnr =) '); 
+            l_itemnr := p_object.get_string('Artikelnr');
+            DBMS_OUTPUT.put_line ('artikelnr: ' || indx || ' - ' || l_itemnr);
+        ELSE
+            dbms_output.put_line('this object doesn''t have this name/property!'); 
+        END IF; /*JSON is case sensitive to both field names and data!*/
+   END LOOP;
+end;
+
+
+
 /* FUNCTION TO JSON ESCAPE CHARACTERS IN ORDS API RESPONSE */
 FUNCTION F_UTIL_JSON_ESC_CHAR(p_text IN varchar2) 
 RETURN VARCHAR2

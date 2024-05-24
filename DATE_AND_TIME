@@ -1,3 +1,16 @@
+/* substract intervals from date and tmstmp */
+    /* If you subtract 1 from a date datatype (e.g. sysdate), it'll move you back one day. But, if you subtract it from a timestamp datatype value, 
+    Oracle will convert it to date and return a date (moreover, it'll be truncated).*/
+
+Select
+    sysdate,
+    sysdate - 1,
+    systimestamp,
+    systimestamp - 1,
+    systimestamp - interval '1' day
+from dual;
+
+
 /* EXTRACT HOUR FROM SYSTIMESTAMP */
 
 SELECT 
